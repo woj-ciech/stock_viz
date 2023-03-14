@@ -250,7 +250,7 @@ option:checked {
   <center></center>
 <option class="selector" id="MAR.csv" >Marriot</option>
 <option class="selector" id="UAL.csv">United Airlines</option>
-<option class="selector"  id="AAL.csv">American Airlines</option>
+<option class="selector"  id="https://raw.githubusercontent.com/woj-ciech/stock_viz/master/AAL.csv">American Airlines</option>
 <option class="selector"  id="SPJT.csv">Spicejet Airlines</option>
 <option class="selector"  id="OMCL.csv">Omnicell</option>
   <option class="selector"  id="LMT.csv">Lockheed Martin</option>
@@ -258,7 +258,7 @@ option:checked {
   <option class="selector"  id="NOC.csv">Northrop Grumman</option>
   <option class="selector"  id="LHX.csv">L3Harris</option>
     <option class="selector"  id="GSK.csv">GSK</option>
-    <option class="selector"  id="BBD.csv">Bombardier</option>
+    <option class="selector"  id="https://raw.githubusercontent.com/woj-ciech/stock_viz/master/BBD.csv">Bombardier</option>
 
   <option class="selector"  id="IMMU.csv">Immunomedics</option>
     <option class="selector"  id="HTM.csv">U.S. Geothermal</option>
@@ -359,7 +359,6 @@ d3.csv("HTM.csv",
 // Function to display event line
 function event(date, desc){
 
-console.log(date);
 /* Code below relevant for annotations */
   const annotations = [{
       note: { label: desc },
@@ -411,8 +410,8 @@ console.log(date);
 <!--      ev.on('click', function(d){-->
 <!--        splitted_date = date.split("-");-->
 <!--        var ptag = document.getElementById('event_details');-->
-<!--        ptag.innerHTML = "Event details: https://www.google.com/search?q="+desc-->
-<!--        ptag.href = "https://www.google.com/search?q="+desc-->
+// <!--        ptag.innerHTML = "Event details: https://www.google.com/search?q="+desc-->
+// <!--        ptag.href = "https://www.google.com/search?q="+desc-->
 <!--      })-->
 }
 
