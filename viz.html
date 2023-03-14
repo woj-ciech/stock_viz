@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<style>
+    .cyberpunk-button {
+      position: relative;
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #fff;
+      background-color: transparent;
+      border: none;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease-out;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .cyberpunk-button:hover {
+      color: #ff00cd;
+      backgrou  nd-color: #00E1FF;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    }
+
+    .cyberpunk-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, #ff00cd, #00E1FF);
+      opacity: 0;
+      transition: opacity 0.3s ease-out;
+      z-index: -1;
+    }
+
+    .cyberpunk-button:hover::before {
+      opacity: 1;
+    }
+
+    .cyberpunk-button span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cyberpunk-button:hover span {
+      text-shadow: 0 0 5px #fff;
+    }
+
+    .cyberpunk-button:before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: url('https://www.transparenttextures.com/patterns/45-degree-fabric-dark.png');
+        opacity: 0.3;
+    }
+  </style>
+
+
+<style>
+
+body {
+    font: 10px "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color:#0a141d;
+}
+
+.x.axis path {
+    display: none;
+}
+
+.overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+.myXaxis line{
+  stroke: #00E1FF;
+}
+
+.myXaxis path{
+  stroke: #00E1FF;
+}
+
+.myXaxis text{
+  fill: #00E1FF;
+  font-size: 14px;
+
+}
+.myYaxis line{
+  stroke: #00E1FF;
+}
+
+.myYaxis path{
+  stroke: #00E1FF;
+}
+
+.myYaxis text{
+  fill: #00E1FF;
+}
+
+.focus circle {
+  fill: steelblue;
+}
+
+.focus text {
+  font-size: 14px;
+}
+
+.tooltip {
+  fill: white;
+  stroke: #000;
+}
+
+.tooltip-date, .tooltip-volume, .tooltip-price {
+  font-weight: bold;
+}
+
+.annotation path {
+  stroke: #0064d7;
+  stroke-width: 0.5px
+
+}
+
+
+
+.annotation text {
+  fill: #00E1FF;
+  font-size: 15px
+}
+
+
+
+    .annotation.above text {
+      fill: var(--annotation-above-color);
+    }
+
+
+
+    .annotation.anomaly text {
+      fill: var(--annotation-anomaly-color);
+    }
+
+    .annotation-note-bg {
+      fill: rgba(0, 0, 0, 0);
+    }
+
+    .annotation-note-title {
+      font-weight: bold;
+    }
+
+ .sort {
+      background-color: #0064d7;
+      color: #fff;
+      border: 2px solid #fff;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 18px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+      transition: background-color 0.3s ease-in-out;
+    }
+    .sort:hover {
+      background-color: #ff00cd;
+    }
+
+select {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 25px;
+  font-weight: bold;
+  color: #fff;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid #00E1FF;
+  outline: none;
+  width: 50%;
+  padding: 10px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  text-align: center;
+}
+
+select:focus {
+  border-bottom: 2px solid #ff00cd;
+}
+
+option {
+  background-color: #0064d7;
+  color: #fff;
+  font-weight: bold;
+}
+
+option:checked {
+  background-color: #ff00cd;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #0064d7;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #00E1FF;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #ff00cd;
+}
+
+</style>
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/1.12.1/d3-annotation.min.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<center>
+<img width="300px" src="https://www.offensiveosint.io/content/images/2020/07/OffensiveOsint-logo-RGB-2.png">
+<div id="my_dataviz"></div>
+</center>
+
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+<!--<center><a id="event_details" style="font-size:50px"></a></center>-->
+
+<center><input class="sort" type="button" value="price">
+  <br>
+
+  <br>
+  <center><input class="sort" type="button" value="volume">
+
+</center>
+<p style="color:#ff00cd;font-size:30px">Choose stock</p>
+<select>
+  <center></center>
+<option class="selector" id="MAR.csv" >Marriot</option>
+<option class="selector" id="UAL.csv">United Airlines</option>
+<option class="selector"  id="AAL.csv">American Airlines</option>
+<option class="selector"  id="SPJT.csv">Spicejet Airlines</option>
+<option class="selector"  id="OMCL.csv">Omnicell</option>
+  <option class="selector"  id="LMT.csv">Lockheed Martin</option>
+  <option class="selector"  id="RTX.csv">Raytheon</option>
+  <option class="selector"  id="NOC.csv">Northrop Grumman</option>
+  <option class="selector"  id="LHX.csv">L3Harris</option>
+    <option class="selector"  id="GSK.csv">GSK</option>
+    <option class="selector"  id="BBD.csv">Bombardier</option>
+
+  <option class="selector"  id="IMMU.csv">Immunomedics</option>
+    <option class="selector"  id="HTM.csv">U.S. Geothermal</option>
+</select>
+  <center><p style="color:#ff00cd;font-size:30px">Terrorist attacks</p></center>
+<input class="cyberpunk-button" type="button"  value="September 11 attacks (2001-09-11)" id="2001-09-11"/>
+<input class="cyberpunk-button" type="button" value="Madrid train bombings (2004-03-11)" id="2004-03-11"/>
+<input class="cyberpunk-button" type="button" value="London bombings (2005-07-07)" id="2005-07-07"/>
+<input class="cyberpunk-button" type="button" value="Mumbai attacks (2008-11-26)" id="2008-11-26"/>
+<input class="cyberpunk-button" type="button" value="Boston Marathon bombing (2013-04-15)" id="2013-04-15"/>
+<input class="cyberpunk-button" type="button" value="Paris attacks (2015-11-13)" id="2015-11-13"/>
+<input class="cyberpunk-button" type="button" value="Orlando nightclub shooting (2016-06-12)" id="2016-06-12"/>
+<input class="cyberpunk-button" type="button" value="Manchester Arena bombing (2017-05-22)" id="2017-05-22"/>
+<input class="cyberpunk-button" type="button" value="Las Vegas shooting (2017-10-01)" id="2017-10-01"/>
+<input class="cyberpunk-button" type="button" value="Christchurch mosque shootings (2019-03-15)" id="2019-03-15"/>
+
+<input class="cyberpunk-button" type="button" value="2001 failed shoe bomb attempt (2001-12-22)" id="2001-12-22"/>
+<input class="cyberpunk-button" type="button" value="Turkish Airlines Flight 1476 hijacking (2006-10-03)" id="2006-10-03"/>
+<input class="cyberpunk-button" type="button" value="2006 transatlantic aircraft plot (006-08-09)" id="2006-08-09"/>
+<input class="cyberpunk-button" type="button" value="Airlines Flight 253 bomb (2009-12-25)" id="2009-12-25"/>
+<input class="cyberpunk-button" type="button" value="Manchester airport bomb plot (2006-08-10)" id="2006-08-10"/>
+
+<p style="color:#ff00cd;font-size:30px">Ransomware attacks</p>
+<input class="cyberpunk-button" type="button" value="Kaseya ransomware attack (2021-07-02)" id="2021-07-02"/>
+<input class="cyberpunk-button" type="button" value="Omnicell ransomware attack (2022-05-09)" id="2022-05-09"/>
+<input class="cyberpunk-button" type="button" value="Spicejet ransomware attack (2022-05-25)" id="2022-05-25"/>
+<input class="cyberpunk-button" type="button" value="WannaCry ransomware attack (2017-05-12)" id="2017-12-05"/>
+<input class="cyberpunk-button" type="button" value="Petya ransomware attack (2017-06-27)" id="2017-06-27"/>
+<input class="cyberpunk-button" type="button" value="Bad Rabbit ransomware attack (2017-10-24)" id="2017-10-24"/>
+
+
+<p style="color:#ff00cd;font-size:30px">Other</p>
+<input class="cyberpunk-button" type="button" value="Immunomedics breast cancer drug (06-04-2020)" id="2020-06-04"/>
+<input class="cyberpunk-button" type="button" value="Agreement between US Geothermal and Ormat (12-19-2017)" id="2017-12-19"/>
+  <input class="cyberpunk-button" type="button" value="Ormat and US Geothermal announcement (12-24-2017)" id="2017-12-24"/>
+  <input class="cyberpunk-button" type="button" value="Lehman Brothers bankruptcy (2008-09-15)" id="2008-09-15"/>
+<input class="cyberpunk-button" type="button" value="European debt crisis (2010-05-10)" id="2010-05-10"/>
+<input class="cyberpunk-button" type="button" value="Japan earthquake and tsunami (2011-03-11)" id="2011-03-11"/>
+<input class="cyberpunk-button" type="button" value="Brexit referendum (2016-06-23)" id="2016-06-23"/>
+<input class="cyberpunk-button" type="button" value="US Presidential election (2016-11-08)" id="2016-11-08"/>
+<input class="cyberpunk-button" type="button" value="COVID-19 pandemic declared (2020-03-11)" id="2020-03-11"/>
+<input class="cyberpunk-button" type="button" value="George Floyd protests (2020-05-25)" id="2020-05-25"/>
+<input class="cyberpunk-button" type="button" value="US Presidential election (2020-11-03)" id="2020-11-03"/>
+<input class="cyberpunk-button" type="button" value="GameStop short squeeze (2021-01-27)" id="2021-01-27"/>
+<input class="cyberpunk-button" type="button" value="Ever Given stuck in Suez Canal (2021-03-23)" id="2021-03-23"/>
+
+
+
+<script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 100, right: 30, bottom: 20, left: 70},
+  width = 1600,
+  height = 800;
+
+var bisectDate = d3.bisector(function(d) { return d.Date; }).left,
+  formatValue = d3.format(",")
+
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+  .attr("width", width)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+
+//Read the data
+d3.csv("HTM.csv",
+
+  // When reading the csv, I must format variables:
+  function(d){
+    return { Date : d3.timeParse("%Y-%m-%d")(d.Date), Volume : d.Volume, Low : d.Low}
+  },
+
+  // Now I can use this dataset:
+  function(data) {
+
+    var x = d3.scaleTime()
+      .domain(d3.extent(data, function(d) { return d.Date; }))
+        .range([ margin.left, width - margin.right]);
+
+    var xAxis = d3.axisBottom().scale(x);
+
+    svg.append("g")
+    .attr("transform", "translate(0,"+ (height - margin.bottom) +")")
+      .attr("class","myXaxis");
+
+    // Add Y axis
+    var y = d3.scaleLinear()
+      .domain([0, d3.max(data, function(d) { return +d.Volume; })])
+      .range([ height - margin.bottom, margin.top ]);
+    var yAxis = d3.axisLeft().scale(y);
+
+    svg.append("g")
+    .attr("class","myYaxis")
+      .attr("transform", "translate(" + margin.left + ", 0)");
+
+// Function to display event line
+function event(date, desc){
+
+console.log(date);
+/* Code below relevant for annotations */
+  const annotations = [{
+      note: { label: desc },
+      subject: {
+        y1: margin.top,
+        y2: height - margin.bottom,
+      },
+      y: margin.top,
+      data: { x: d3.timeParse("%Y-%m-%d")(date)} // does not work, it's not accurate
+    }
+
+  ]
+
+
+    //An example of taking the XYThreshold and merging it
+    //with custom settings so you don't have to
+    //repeat yourself in the annotations Objects
+    const type = d3.annotationCustomType(
+      d3.annotationXYThreshold,
+      {"note":{
+          "lineType":"none",
+          "orientation": "top",
+          "align":"middle"}
+      }
+    )
+
+    const makeAnnotations = d3.annotation()
+      .type(type)
+      //Gives you access to any data objects in the annotations array
+      .accessors({
+        x: function(d){ return x(d3.timeParse("%Y-%m-%d")(date))}, // does not work, it's not accurate
+        y: function(d){ return y(d.y) }
+      })
+      .annotations(annotations)
+      .textWrap(80)
+
+      var ev =
+        d3.select("svg")
+        .append("g")
+        .attr("id", "cyberpunk-button")
+        .attr("class", "annotation-group")
+        .call(makeAnnotations);
+
+
+        // when click on line, display link to google.
+        // I wanted to do the same but for the chart.
+        // When user click, it display link to google with the name of the company and data range (3 days before and after)
+        // something like  https://www.google.com/search?q=immunomedics&tbs=cdr:1,cd_min:9/4/2021,cd_max:9/11/2021
+<!--      ev.on('click', function(d){-->
+<!--        splitted_date = date.split("-");-->
+<!--        var ptag = document.getElementById('event_details');-->
+<!--        ptag.innerHTML = "Event details: https://www.google.com/search?q="+desc-->
+<!--        ptag.href = "https://www.google.com/search?q="+desc-->
+<!--      })-->
+}
+
+var file;
+function update(source, vtype, sort) {
+    file = source;
+
+  d3.csv(source,
+
+
+  function(d){
+    return { Date : d3.timeParse("%Y-%m-%d")(d.Date), Volume : d.Volume, Low : d.Low}
+  },
+
+
+  function(source) {
+    if (!sort){
+    d3.selectAll(".annotation-group").remove(); // clean all annotations and paths
+}
+    var formatTime = d3.timeFormat("%d %B, %Y");
+
+    x.domain([d3.min(source, function(d) { return d.Date }), d3.max(source, function(d) { return d.Date }) ]);
+
+    svg.selectAll(".myXaxis")
+      .transition()
+      .duration(1000)
+      .call(xAxis);
+
+    // create y axis depends of the displayed type (volume, price)
+    if (vtype=="volume"){
+    y.domain([d3.min(source, function(d) { return +d.Volume  }), d3.max(source, function(d) { return +d.Volume  }) ]);
+    }
+    else
+    {
+      y.domain([d3.min(source, function(d) { return +d.Low  }), d3.max(source, function(d) { return +d.Low  }) ]);
+    }
+
+    svg.selectAll(".myYaxis")
+      .transition()
+      .duration(1000)
+      .call(yAxis);
+
+    // mouse move, tooltip
+    var focus = svg.append("g")
+      .attr("class", "focus")
+      .style("display", "none")
+
+
+    focus.append("circle")
+      .attr("r", 5)
+
+    focus.append("rect")
+      .attr("class", "tooltip")
+      .attr("width", 150)
+      .attr("height", 80)
+      .attr("x", 10)
+      .attr("y", -22)
+      .attr("rx", 4)
+      .attr("ry", 4);
+
+    focus.append("text")
+      .attr("class", "tooltip-date")
+      .attr("x", 18)
+      .attr("y", -2);
+
+    focus.append("text")
+      .attr("class", "tooltip-volume")
+      .attr("x", 70)
+      .attr("y", 18);
+
+    focus.append("text")
+      .attr("class", "tooltip-price")
+      .attr("x", 60)
+      .attr("y", 38)
+
+    focus.append("text")
+      .attr("x", 18)
+      .attr("y", 18)
+      .text("Volume: ")
+
+    focus.append("text")
+      .attr("x", 18)
+      .attr("y", 38)
+      .text("Price: ")
+
+    svg.append("rect")
+      .attr("class", "overlay")
+      .attr("width", width)
+      .attr("height", height)
+      .on("mouseover", function() { focus.style("display", null); })
+      .on("mouseout", function() { focus.style("display", "none"); })
+      .on("mousemove", mousemove);
+
+    function mousemove() {
+      var x0 = x.invert(d3.mouse(this)[0]),
+          i = bisectDate(source, x0, 1),
+          d0 = source[i - 1],
+          d1 = source[i],
+          d = x0 - d0.Date > d1.Date - x0 ? d1 : d0;
+
+      if (vtype=="volume"){
+      focus.attr("transform", "translate(" + x(d.Date) + "," + y(d.Volume) + ")");
+      }
+      else {
+            focus.attr("transform", "translate(" + x(d.Date) + "," + y(d.Low) + ")");
+
+      }
+      focus.select(".tooltip-date").text(formatTime(d.Date));
+      focus.select(".tooltip-volume").text(d.Volume.substring(0, 6))
+      focus.select(".tooltip-price").text(d.Low.substring(0, 6));
+    }
+
+
+  var u = svg.selectAll(".lineTest")
+  .data([source], function(d){ return d.Date })
+
+  u
+    .enter()
+    .append("path")
+    .attr("class","lineTest")
+    .merge(u)
+    .transition()
+    .duration(1000)
+    .attr("d", d3.line()
+      .x(function(d) { return x(d.Date); })
+      .y(function(d) {  if (vtype=="volume"){ return y(d.Volume);} else { return y(d.Low);} }))
+      .attr("fill", "none")
+      .attr("stroke", "#ff00cd")
+      .attr("stroke-width", 1)
+    })
+    }
+
+    var file;
+    d3.selectAll('.cyberpunk-button')
+      .on('click', function(d) {
+        event(this.id, this.value);
+      })
+
+      d3.selectAll('.sort')
+      .on('click', function(d) {
+        update(file, this.value, "sort");
+      })
+
+    d3.selectAll('.selector')
+    .on('click', function(d) {
+      file = this.id;
+      update(this.id, "price");
+    })
+      file = "MAR.csv";
+      update(file,  "price");
+})
+
+</script>
+</body>
