@@ -2,8 +2,79 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
-
+<script
+                src="https://code.jquery.com/jquery-3.6.1.min.js"
+                integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+                crossorigin="anonymous"></script>
 <style>
+
+    .flight-types {
+  display: flex;
+  max-width: 336px;
+  width: 100%;
+  position: relative;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  position: relative;
+  z-index: 1;
+  margin: 0 auto;
+  font-size: 12px;
+  border: 1px solid #fff;
+  border-radius: 3px;
+  color: #fff;
+}
+.flight-types > input {
+  display: none;
+}
+.flight-types > input:checked + label {
+  color: #3395DE;
+}
+.flight-types > input:nth-of-type(1):checked ~ label:last-of-type:before {
+  transform: translateX(calc(0% + 0px));
+}
+.flight-types > input:nth-of-type(2):checked ~ label:last-of-type:before {
+  transform: translateX(calc(100% + 0px));
+}
+.flight-types > input:nth-of-type(3):checked ~ label:last-of-type:before {
+  transform: translateX(calc(200% + 0px));
+}
+.flight-types label {
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.flight-types label:last-of-type:before {
+  content: "";
+  display: block;
+  max-width: calc(33.3333333333% - 0px);
+  margin: 0px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  transform: translateX(0);
+}
+.flight-types label {
+  padding: 6px 3px;
+  transition: color 250ms cubic-bezier(0, 0.95, 0.38, 0.98);
+}
+.flight-types label:before {
+  background: #fff;
+  transition: all 250ms cubic-bezier(0, 0.95, 0.38, 0.98);
+}
+.flight-types label:not(:last-child) {
+  border-right: 1px solid #fff;
+}
+
+
+
+
+
     .cyberpunk-button {
         position: relative;
         display: inline-block;
@@ -21,9 +92,13 @@
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     }
 
+/*    .cyberpunk-button:focus {*/
+/*    background-color:yellow;*/
+/*}*/
+
     .cyberpunk-button:hover {
-        color: #ff00cd;
-        backgrou nd-color: #00E1FF;
+        /*color: #ff00cd;*/
+        /*background-color: #00E1FF;*/
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
     }
 
@@ -156,21 +231,20 @@
         font-weight: bold;
     }
 
-    .sort {
-        background-color: #0064d7;
-        color: #fff;
-        border: 2px solid #fff;
-        padding: 10px 20px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 18px;
-        font-weight: bold;
-        letter-spacing: 1px;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-        border-radius: 5px;
-        transition: background-color 0.3s ease-in-out;
-    }
+.sort {
+  margin-left: -5px;
+  width: 150px;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 0px;
+}
 
     .sort:hover {
         background-color: #ff00cd;
@@ -187,8 +261,8 @@
         outline: none;
         width: 50%;
         padding: 10px;
-        -webkit-appearance: none;
-        -moz-appearance: none;
+        /*-webkit-appearance: none;*/
+        /*-moz-appearance: none;*/
         appearance: none;
         text-align: center;
     }
@@ -224,6 +298,18 @@
         background-color: #ff00cd;
     }
 
+    #price:focus {
+        background-color: #ff00cd;
+    }
+    #volume:focus {
+        background-color: #ff00cd;
+    }
+
+/*    select {*/
+/*-webkit-appearance: listbox !important;*/
+/*}*/
+    select::-ms-expand { display: block; }
+
 </style>
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
@@ -242,13 +328,11 @@
 
 <!--<center><a id="event_details" style="font-size:50px"></a></center>-->
 
-<center><input class="sort" type="button" value="price">
-    <br>
+<center><input id="price"  class="sort" type="button" value="price" onclick="changeColor('price', 'volume')">
 
-    <br>
-    <center><input class="sort" type="button" value="volume">
+<input class="sort" id="volume" type="button" value="volume" onclick="changeColor('price', 'volume')">
 
-    </center>
+
     <p style="color:#ff00cd;font-size:30px">Choose stock</p>
     <select>
         <center></center>
@@ -490,6 +574,8 @@
                             var focus = svg.append("g")
                                 .attr("class", "focus")
                                 .style("display", "none")
+                                .style("z-index", 9999)
+                                .style("position", "absolute")
 
 
                             focus.append("circle")
@@ -497,6 +583,7 @@
 
                             focus.append("rect")
                                 .attr("class", "tooltip")
+
                                 .attr("width", 150)
                                 .attr("height", 80)
                                 .attr("x", 10)
@@ -610,5 +697,21 @@
             })
 
     </script>
+    <script>
+          $( ".cyberpunk-button" ).click(function() {
+    $(this).css('background', '#ff00cd');
+  });
+          $( "#price" ).click(function() {
+    $(this).css('background', '#ff00cd');
+    document.getElementById("volume").style.background = "white";
+  });
+          $( "#volume" ).click(function() {
+    $(this).css('background', '#ff00cd');
+    document.getElementById("price").style.background = "white";
+  });
+
+
+    </script>
+
     </body>
     </html>
